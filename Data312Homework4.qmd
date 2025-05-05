@@ -1,0 +1,201 @@
+---
+title: "Homework 4"
+author: "Taku Takahashi"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Homework 4
+
+The primary goal of homework 4 is to give you hands-on practice with a number of dplyr verbs we went over in Lecture 3 and 4 via Exercise3 and Exercise4.
+
+For your convenience, the relevant resources for this homework are as follows:
+
+1.  Lecture 3 slides is located here: <https://jmtfeliciano.github.io/DATA312Spring2025/Data312Spring2025_Lecture3#1>
+
+2.  Lecture 4 slides is located here: <https://jmtfeliciano.github.io/DATA312Spring2025/Data312Spring2025_Lecture4#1>
+
+3.  Filled in Exercise 3 HTML page as a reference guide:
+
+    <https://jmtfeliciano.github.io/DATA312Spring2025/Exercise3FilledIn.html>
+
+4.  Filled in Exercise 4 HTML page as a reference guide:
+
+    <https://jmtfeliciano.github.io/DATA312Spring2025/Data312Exercise4FilledIn.html>
+
+## What you need to do
+
+You will be assigned tasks throughout this Quarto Document where you will need to fill in R code appropriately based on what was taught in Exercise3.qmd and Exercise4.qmd
+
+## Preliminaries
+
+This R code chunk will load the tidyverse packages and create a data frame called **sba_investments**
+
+Make sure to run this script before doing any of the tasks below which will allow you to create **sba_investments** using csv data from my GitHub account (also make sure to quickly look at the printed data to examine variables/columns and general contents):
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+sba_investments <- read_csv("https://raw.githubusercontent.com/jmtfeliciano/teachingdata/refs/heads/main/data7a2024localdata.csv")
+head(sba_investments, 10) 
+```
+
+## **Background information on** sba_investments
+
+**sba_investments** is a partial extract of data made publicly available in <https://data.sba.gov/dataset/7-a-504-foia> by the United States Small Business Administration (<https://www.sba.gov/>), a federal agency that provides support to entrepreneurs and small businesses.
+
+**sba_investments** is data for the 7(a) loan assistance program made by the agency for Fiscal Year 2024. The subset you are working with is data I restricted for the purpose of this homework to the following states: DC, DE, MD, NC, VA, and WV. To learn more about 7(a), you may visit <https://www.sba.gov/funding-programs/loans/7a-loans> to learn more.
+
+To access detailed documentation for each of the variable or column contained within the data, you may download and access the 7a Data Dictionary via <https://data.sba.gov/dataset/7-a-504-foia/resource/6898b986-a895-47b4-bb7e-c6b286b23a7b>
+
+## Task 1 (1 pt)
+
+Use the distinct() verb with the **sba_investments** we loaded earlier to show the the distinct values of **LoanStatus** in the R code chunk below:
+
+```{r}
+# Your solution below:
+distinct(sba_investments, LoanStatus)
+```
+
+## Task 2 (1 pt)
+
+Suppose you are tasked by a supervisor to find the specific record in **sba_investments** where the borrower state (**BorrState**) is "DC" with a **NaicsCode** of 238150
+
+Using filter() with **sba_investments**, show or print the required specific record below:
+
+```{r}
+# Your solution below:
+sba_investments |> 
+  filter(BorrState == "DC",
+         NaicsCode == 238150)
+```
+
+## Task 3 (1 pt)
+
+Use select() in the R code chunk below to create a data subset of **sba_investments** that only contains **Program**, **BorrName**, **BorrState**, **GrossApproval**, **InitialInterestRate**, **NaicsDescription**, and **JobsSupported**. Save this data into your R environment as **sba_subset**. At the end of the code chunk, print a sample of **sba_subset** by using head() or glimpse():
+
+```{r}
+# Your solution below:
+sba_subset <- sba_investments |> 
+  select(Program, BorrName, BorrState, GrossApproval, InitialInterestRate, NaicsDescription, JobsSupported)
+```
+
+## Task 4 (1 pt)
+
+Using **sba_subset,** calculate the sum of jobs supported (**JobsSupported)** broken down by borrower state (**BorrState).** Name this sum column however you want (e.g., total_jobs).
+
+**Hint you may not be offered in an exam:** using group_by() and summarize() with sum().
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  group_by(BorrState) |> 
+  summarise(total_jobs = sum(JobsSupported))
+```
+
+## Task 5 (1 pt)
+
+Using **sba_subset,** calculate and print the mean interest rate (**InitialInterestRate)** broken down by borrower state (**BorrState).** Name this mean column however you want (e.g., average_interest).
+
+**Hint you may not be offered in an exam:** using group_by() and summarize() with mean().
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  group_by(BorrState) |> 
+  summarise(average_interest = mean(InitialInterestRate))
+```
+
+## Task 6 (1 pt)
+
+Using **sba_subset** and summarize()**,** calculate and print the overall median loan approval amount (**GrossApproval**) *for the entire data set*. Name this median column however you want (e.g., median_approved).
+
+**Hint you may not be offered in an exam:** summarize() with median() and without group_by() this time.
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  summarise(median_approved = mean(GrossApproval))
+```
+
+## Task 7 (1 pt)
+
+Using **sba_subset,** calculate and print the overall sum of total loan amount (**GrossApproval**) approved for Nail Salons only (i.e., where **NaicsDescription** is "Nail Salons") within the data set. Name this median column however you want (e.g., sum_approved).
+
+**Hint that you may not be offered in an exam:** sba_subset is piped into filter() which is piped into summarize().
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  filter(NaicsDescription == "Nail Salons") |> 
+  summarise(sum_approved = sum(GrossApproval))
+  
+```
+
+## Task 8 (1 pt)
+
+Using **sba_subset,** calculate and print the overall sum of total loan amount (**GrossApproval**) approved for Nail Salons only (i.e., where **NaicsDescription** is "Nail Salons") in Virginia and Maryland only (i.e., where **BorrState** is VA or MD). Name this median column however you want (e.g., sum_approved).
+
+**Hint that you may not be offered in an exam:** Modify your Task 7 code by further refining your filter() statement or by piping what you already wrote into another filter() to account for the additional request in Task 8.
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  filter(NaicsDescription == "Nail Salons") |> 
+  filter(BorrState == "VA" | BorrState == "MD") |> 
+  summarise(sum_approved = sum(GrossApproval))
+  
+```
+
+## Task 9 (1 pt)
+
+The table you will need to complete (see prompt below):
+
+| Top 5 Industry (NaicsDescription) with Most SBA 7(a) Loan Approved | Total \$ Loan Approved (GrossApproval) |
+|----|----|
+|  |  |
+|  |  |
+|  |  |
+|  |  |
+|  |  |
+
+Suppose you are a data analyst within SBA who is tasked to identify the top 5 industries that received the most approved loans. In other words, you need to calculate and identify the top 5 industries (NaicsDescription) with the highest loan approved (GrossApproval).
+
+Using **sba_subset**, fill in the empty table above. You will not get credit unless you write an R code within the following R chunk that prints this insight below that you can copy from. Note: if the R chunk below partially obscures the output you need to copy from, please rerun the code via the R console for an unobstructed view of the output.
+
+**Hint that you may not be offered in an exam:** pipe sba_subsetintousing group_by() then pipe into summarize() then pipe into arrange(desc(\[your sum column name\])). The first five rows are what you need.
+
+```{r}
+# Your solution below:
+sba_subset |> 
+  group_by(NaicsDescription) |> 
+  summarise(sum_approved = sum(GrossApproval)) |> 
+  arrange(desc(sum_approved)) |> 
+  head(5)
+```
+
+## Task 10 (1 pt)
+
+Using **sba_subset,** create a new R object into your R environment named **sba_subset_v2** after using rename() to rename the following: Program into program_name; BorrName into borrower_name; BorrState into borrower_state; GrossApproval into loan_approved; InitialInterestRate into interest_rate; NaicsDescription into industry_description; and JobsSupported into jobs_supported.
+
+Make sure to print **sba_subset_named** below too using head() or glimpse():
+
+```{r}
+# Your solution below:
+sba_subset_named <- sba_subset |> 
+  rename(borrower_state = BorrState,
+         loan_approaved = GrossApproval,
+         interest_rate = InitialInterestRate,
+         industry_description = NaicsDescription,
+         jobs_supported = JobsSupported)
+
+head(sba_subset_named)
+
+sba_subset_v2 <- sba_subset_named
+sba_subset_v2
+```
+
+## 
